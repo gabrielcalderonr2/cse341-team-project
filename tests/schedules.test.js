@@ -1,6 +1,4 @@
 import {
-  beforeAll,
-  afterAll,
   describe,
   expect,
   test
@@ -8,16 +6,7 @@ import {
 
 import request from 'supertest';
 import app from '../app.js';
-import { connectMongoose } from '../src/db/mongoose.js';
-import mongoose from '../src/db/mongoose.js';
 
-beforeAll(async () => {
-  await connectMongoose();
-});
-
-afterAll(async () => {
-  await mongoose.disconnect();
-});
 
 describe('GET /api/trips/:id/schedules', () => {
   test('returns a successful JSON response', async () => {

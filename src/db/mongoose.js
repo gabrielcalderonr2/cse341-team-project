@@ -2,14 +2,26 @@ import mongoose from "mongoose";
 
 let connectionPromise;
 
-export async function connectMongoose() {
+export async function connectMongoose(options = {}) {
   if (mongoose.connection.readyState === 1) {
     return mongoose.connection;
   }
 
   if (!connectionPromise) {
-    connectionPromise = mongoose.connect(process.env.MONGODB_URI, {
-      dbName: process.env.MONGODB_DB_NAME || "kizuna-rail",
+    const connectionString =
+      options.connectionString || process.env.MONGODB_URI;
+
+    const databaseName =
+      options.databaseName ||
+      process.env.MONGODB_DB_NAME ||
+      "kizuna-rail";
+
+    if (!connectionString) {
+      throw new Error("MONGODB_URI is required.");
+    }
+
+    connectionPromise = mongoose.connect(connectionString, {
+      dbName: databaseName,
     });
   }
 
