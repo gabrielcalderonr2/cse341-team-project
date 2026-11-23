@@ -1,5 +1,6 @@
 const hookRegionSorter = () => {
     const regionSelect = document.getElementById('region-filter');
+
     if (regionSelect) {
         regionSelect.addEventListener('change', () => {
             const selectedRegion = regionSelect.value;
@@ -10,7 +11,7 @@ const hookRegionSorter = () => {
             } else {
                 url.searchParams.delete('region');
             }
-            
+
             window.location.href = url.toString();
         });
     }
@@ -18,6 +19,7 @@ const hookRegionSorter = () => {
 
 const hookSeasonSorter = () => {
     const seasonSelect = document.getElementById('season-filter');
+
     if (seasonSelect) {
         seasonSelect.addEventListener('change', () => {
             const selectedSeason = seasonSelect.value;
@@ -28,7 +30,7 @@ const hookSeasonSorter = () => {
             } else {
                 url.searchParams.delete('season');
             }
-            
+
             window.location.href = url.toString();
         });
     }
@@ -46,6 +48,7 @@ const hookTrainsCatalog = async () => {
 
     try {
         const response = await fetch('/api/trains');
+
         if (!response.ok) {
             throw new Error(`Failed to load trains (${response.status})`);
         }
@@ -74,13 +77,17 @@ const hookTrainsCatalog = async () => {
         });
 
         listEl.replaceChildren(fragment);
+
         if (loadingEl) {
             loadingEl.hidden = true;
         }
     } catch (error) {
+        console.error('Error loading trains:', error);
+
         if (loadingEl) {
             loadingEl.hidden = true;
         }
+
         if (errorEl) {
             errorEl.hidden = false;
             errorEl.textContent = 'Unable to load trains right now. Please try again in a moment.';
@@ -88,8 +95,120 @@ const hookTrainsCatalog = async () => {
     }
 };
 
+// Load schedules dynamically when a month is selected.
+const hookScheduleMonths = () => {
+    const monthsContainer = document.getElementById('operating-months');
+    const schedulesGrid = document.getElementById('schedules-grid');
+
+    if (!monthsContainer || !schedulesGrid) {
+        return;
+    }
+
+    const tripId = monthsContainer.dataset.tripId;
+    const monthButtons = monthsContainer.querySelectorAll('[data-month]');
+
+    const loadSchedules = async (month) => {
+        schedulesGrid.innerHTML = '<p>Loading schedules...</p>';
+
+        try {
+            const response = await fetch(
+                `/api/trips/${encodeURIComponent(tripId)}/schedules?month=${encodeURIComponent(month)}`
+            );
+
+            if (!response.ok) {
+                throw new Error(`Failed to load schedules (${response.status})`);
+            }
+
+            const schedules = await response.json();
+
+            if (!schedules.length) {
+                schedulesGrid.innerHTML = '<p>No schedules available for this month.</p>';
+                return;
+            }
+
+            schedulesGrid.replaceChildren();
+
+            schedules.forEach((schedule) => {
+                const card = document.createElement('div');
+                card.className = 'schedule-card';
+
+                const times = document.createElement('div');
+                times.className = 'schedule-times';
+
+                const departure = document.createElement('div');
+                departure.className = 'time-block';
+
+                const departureLabel = document.createElement('span');
+                departureLabel.className = 'time-label';
+                departureLabel.textContent = 'Departs';
+
+                const departureTime = document.createElement('span');
+                departureTime.className = 'time-value';
+                departureTime.textContent = schedule.departureTime;
+
+                departure.append(departureLabel, departureTime);
+
+                const arrow = document.createElement('span');
+                arrow.className = 'time-arrow';
+                arrow.textContent = '→';
+
+                const arrival = document.createElement('div');
+                arrival.className = 'time-block';
+
+                const arrivalLabel = document.createElement('span');
+                arrivalLabel.className = 'time-label';
+                arrivalLabel.textContent = 'Arrives';
+
+                const arrivalTime = document.createElement('span');
+                arrivalTime.className = 'time-value';
+                arrivalTime.textContent = schedule.arrivalTime;
+
+                arrival.append(arrivalLabel, arrivalTime);
+
+                times.append(departure, arrow, arrival);
+
+                const days = document.createElement('div');
+                days.className = 'schedule-days';
+
+                schedule.daysOfWeek.forEach((day) => {
+                    const badge = document.createElement('span');
+                    badge.className = 'day-badge';
+                    badge.textContent = day.substring(0, 3);
+                    days.appendChild(badge);
+                });
+
+                const bookLink = document.createElement('a');
+                bookLink.className = 'book-btn';
+                bookLink.href = `/trips/booking/${encodeURIComponent(schedule.id)}`;
+                bookLink.textContent = 'Book Now';
+
+                card.append(times, days, bookLink);
+                schedulesGrid.appendChild(card);
+            });
+        } catch (error) {
+            console.error('Error loading schedules:', error);
+            schedulesGrid.innerHTML =
+                '<p>Unable to load schedules. Please try again.</p>';
+        }
+    };
+
+    monthButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            const month = button.dataset.month;
+
+            monthButtons.forEach((item) => {
+                item.classList.remove('active');
+            });
+
+            button.classList.add('active');
+            loadSchedules(month);
+        });
+    });
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     hookRegionSorter();
     hookSeasonSorter();
     hookTrainsCatalog();
+    hookScheduleMonths();
 });
