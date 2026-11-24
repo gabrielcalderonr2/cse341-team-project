@@ -16,9 +16,7 @@
       "get": {
         "summary": "Get schedules for a specific trip",
         "description": "Returns schedules for a trip. An optional month can be provided to check whether the trip operates during that month.",
-        "tags": [
-          "Schedules"
-        ],
+        "tags": ["Schedules"],
         "parameters": [
           {
             "in": "path",
@@ -51,26 +49,58 @@
                   "items": {
                     "type": "object",
                     "properties": {
-                      "id": {
-                        "type": "integer"
-                      },
-                      "tripId": {
-                        "type": "string"
-                      },
-                      "departureTime": {
-                        "type": "string"
-                      },
-                      "arrivalTime": {
-                        "type": "string"
-                      },
+                      "id": { "type": "integer" },
+                      "tripId": { "type": "string" },
+                      "departureTime": { "type": "string" },
+                      "arrivalTime": { "type": "string" },
                       "daysOfWeek": {
                         "type": "array",
-                        "items": {
-                          "type": "string"
-                        }
+                        "items": { "type": "string" }
                       },
-                      "status": {
-                        "type": "boolean"
+                      "status": { "type": "boolean" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to fetch schedules"
+          }
+        }
+      }
+    },
+    "/api/bookings": {
+      "get": {
+        "summary": "Get all bookings",
+        "description": "Returns all bookings stored in the database.",
+        "tags": ["Bookings"],
+        "responses": {
+          "200": {
+            "description": "List of bookings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "string" },
+                      "scheduleId": { "type": "integer" },
+                      "tripId": { "type": "string" },
+                      "ticketClass": { "type": "string" },
+                      "selectedDay": { "type": "string" },
+                      "passengers": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "firstName": { "type": "string" },
+                            "lastName": { "type": "string" },
+                            "email": { "type": "string" },
+                            "phone": { "type": "string" }
+                          }
+                        }
                       }
                     }
                   }
@@ -79,15 +109,13 @@
             }
           },
           "500": {
-            "description": "Failed to fetch schedules",
+            "description": "Failed to fetch bookings",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "error": {
-                      "type": "string"
-                    }
+                    "error": { "type": "string" }
                   }
                 }
               }

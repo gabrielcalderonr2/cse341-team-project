@@ -32,3 +32,6 @@ export async function getSchedulesByTripId(tripId, month = null) {
     // Return schedules belonging to the selected trip.
     return schedule.find({ tripId }).lean();
 }
+export async function getScheduleById(id) {
+    return schedule.findOne({ id }).lean();
+}
