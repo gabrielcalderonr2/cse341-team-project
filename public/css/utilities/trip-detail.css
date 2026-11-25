@@ -168,16 +168,23 @@ article.route-detail {
                 gap: var(--space-sm);
 
                 .month-badge {
-                    padding: var(--space-sm) var(--space-md);
-                    background-color: var(--clr-surface);
-                    border: 1px solid var(--clr-border-light);
-                    border-radius: var(--radius-md);
-                    color: var(--clr-text-primary);
-                    font-size: var(--font-size-sm);
-                    font-weight: 500;
-                    min-width: 48px;
-                    text-align: center;
-                }
+    padding: var(--space-sm) var(--space-md);
+    background-color: var(--clr-surface);
+    border: 1px solid var(--clr-border-light);
+    border-radius: var(--radius-md);
+    color: var(--clr-text-primary);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    min-width: 48px;
+    text-align: center;
+    cursor: pointer;
+
+    &.active {
+        background-color: var(--clr-primary);
+        border-color: var(--clr-primary);
+        color: white;
+    }
+}
             }
         }
 

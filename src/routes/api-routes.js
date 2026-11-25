@@ -13,6 +13,10 @@ import {
   getAllTicketClasses,
   getTicketClassByName,
 } from "../controllers/ticket-classes.js";
+import {
+  getAllTrips,
+  getTripById,
+} from "../controllers/trips.js";
 
 const router = Router();
 
@@ -24,6 +28,9 @@ router.get('/api/stations/:id', getStationById);
 // Ticket Classes API
 router.get('/api/ticket-classes', getAllTicketClasses);
 router.get('/api/ticket-classes/:className', getTicketClassByName);
+// Trips API
+router.get("/api/trips", getAllTrips);
+router.get("/api/trips/:id", getTripById);
 
 /**
  * @openapi
@@ -120,6 +127,51 @@ router.get('/api/ticket-classes/:className', getTicketClassByName);
  *         description: Ticket class not found
  *       500:
  *         description: Failed to fetch ticket class
+ */
+
+/**
+ * @openapi
+ * /api/trips:
+ *   get:
+ *     summary: Get all trips
+ *     description: Returns all scenic train trips stored in the database.
+ *     tags:
+ *       - Trips
+ *     responses:
+ *       200:
+ *         description: List of trips
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *       500:
+ *         description: Failed to fetch trips
+ */
+
+/**
+ * @openapi
+ * /api/trips/{id}:
+ *   get:
+ *     summary: Get a trip by ID
+ *     description: Returns a specific scenic train trip.
+ *     tags:
+ *       - Trips
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Unique trip identifier
+ *     responses:
+ *       200:
+ *         description: Trip found
+ *       404:
+ *         description: Trip not found
+ *       500:
+ *         description: Failed to fetch trip
  */
 
 /**

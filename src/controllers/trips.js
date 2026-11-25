@@ -1,37 +1,20 @@
 import {
-  getAllTrips,
-  getTripById,
-  getTripRegions,
-  getTripSeasons,
+  getAllTrips as findAllTrips,
+  getTripById as findTripById,
 } from "../models/trips.js";
 
+// EJS Controllers
+
 export async function listTripsPage(req, res) {
-  try {
-    const [regions, trips, seasons] = await Promise.all([
-      getTripRegions(),
-      getAllTrips(),
-      getTripSeasons(),
-    ]);
-
-    return res.render("trips/list", {
-      title: "Scenic Train Trips",
-      regions,
-      trips,
-      seasons,
-    });
-  } catch (error) {
-    console.error("Error loading trips:", error);
-
-    return res.status(500).render("errors/500", {
-      title: "Server Error",
-    });
-  }
+  return res.render("trips/list", {
+    title: "Scenic Train Trips",
+  });
 }
 
 export async function tripDetailsPage(req, res) {
   try {
     const { tripId } = req.params;
-    const details = await getTripById(tripId);
+    const details = await findTripById(tripId);
 
     if (!details) {
       return res.status(404).render("errors/404", {
@@ -49,5 +32,33 @@ export async function tripDetailsPage(req, res) {
     return res.status(500).render("errors/500", {
       title: "Server Error",
     });
+  }
+}
+
+// API Controllers
+
+export async function getAllTrips(req, res) {
+  try {
+    const trips = await findAllTrips();
+    return res.status(200).json(trips);
+  } catch (error) {
+    console.error("Error fetching trips:", error);
+    return res.status(500).json({ error: "Failed to fetch trips" });
+  }
+}
+
+export async function getTripById(req, res) {
+  try {
+    const { id } = req.params;
+    const trip = await findTripById(id);
+
+    if (!trip) {
+      return res.status(404).json({ error: "Trip not found" });
+    }
+
+    return res.status(200).json(trip);
+  } catch (error) {
+    console.error("Error fetching trip:", error);
+    return res.status(500).json({ error: "Failed to fetch trip" });
   }
 }
