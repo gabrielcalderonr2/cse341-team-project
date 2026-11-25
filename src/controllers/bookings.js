@@ -1,5 +1,9 @@
-import mongoose from "../db/mongoose.js";
 import { getScheduleById } from "../models/schedules.js";
+import { getTripById } from "../models/trips.js";
+import {
+  getAllTicketClasses,
+  getTicketClassByName,
+} from "../models/ticket-classes.js";
 import {
   createBooking,
   getAllBookings as findAllBookings,
@@ -15,26 +19,19 @@ export async function bookingPage(req, res) {
       return res.status(400).send("Invalid schedule ID.");
     }
 
-    const db = mongoose.connection;
-
     const schedule = await getScheduleById(scheduleId);
 
     if (!schedule || !schedule.status) {
       return res.status(404).send("Schedule not found or unavailable.");
     }
 
-    const trip = await db.collection("trips").findOne({
-      id: schedule.tripId,
-    });
+    const trip = await getTripById(schedule.tripId);
 
     if (!trip) {
       return res.status(404).send("Trip not found.");
     }
 
-    const ticketClasses = await db
-      .collection("ticketClasses")
-      .find({})
-      .toArray();
+    const ticketClasses = await getAllTicketClasses();
 
     const ticketOptions = ticketClasses.map((ticketClass) => ({
       class: ticketClass.class,
@@ -70,8 +67,6 @@ export async function processBookingRequest(req, res) {
       return res.status(400).send("Invalid schedule ID.");
     }
 
-    const db = mongoose.connection;
-
     const schedule = await getScheduleById(numericScheduleId);
 
     if (!schedule || !schedule.status) {
@@ -82,9 +77,7 @@ export async function processBookingRequest(req, res) {
       return res.status(400).send("Selected day is not available.");
     }
 
-    const selectedTicketClass = await db
-      .collection("ticketClasses")
-      .findOne({ class: ticketClass });
+    const selectedTicketClass = await getTicketClassByName(ticketClass);
 
     if (!selectedTicketClass) {
       return res.status(400).send("Invalid ticket class.");

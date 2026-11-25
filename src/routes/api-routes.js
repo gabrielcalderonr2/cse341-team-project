@@ -5,11 +5,122 @@ import {
   getSchedulesForTripAndMonth,
 } from '../controllers/schedules.js';
 import { getAllBookings } from '../controllers/bookings.js';
+import {
+  getAllStations,
+  getStationById,
+} from "../controllers/stations.js";
+import {
+  getAllTicketClasses,
+  getTicketClassByName,
+} from "../controllers/ticket-classes.js";
 
 const router = Router();
 
 // Trains API
 router.get('/api/trains', trainsApi);
+// Stations API
+router.get('/api/stations', getAllStations);
+router.get('/api/stations/:id', getStationById);
+// Ticket Classes API
+router.get('/api/ticket-classes', getAllTicketClasses);
+router.get('/api/ticket-classes/:className', getTicketClassByName);
+
+/**
+ * @openapi
+ * /api/stations:
+ *   get:
+ *     summary: Get all stations
+ *     description: Returns all railway stations stored in the database.
+ *     tags:
+ *       - Stations
+ *     responses:
+ *       200:
+ *         description: List of stations
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   name:
+ *                     type: string
+ *                   prefecture:
+ *                     type: string
+ *                   region:
+ *                     type: string
+ *                   facilities:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ *                   description:
+ *                     type: string
+ *       500:
+ *         description: Failed to fetch stations
+ */
+/**
+ * @openapi
+ * /api/stations/{id}:
+ *   get:
+ *     summary: Get a station by ID
+ *     description: Returns a specific railway station.
+ *     tags:
+ *       - Stations
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Unique station identifier
+ *     responses:
+ *       200:
+ *         description: Station found
+ *       404:
+ *         description: Station not found
+ *       500:
+ *         description: Failed to fetch station
+ */
+/**
+ * @openapi
+ * /api/ticket-classes:
+ *   get:
+ *     summary: Get all ticket classes
+ *     description: Returns all available ticket classes.
+ *     tags:
+ *       - Ticket Classes
+ *     responses:
+ *       200:
+ *         description: List of ticket classes
+ *       500:
+ *         description: Failed to fetch ticket classes
+ */
+
+/**
+ * @openapi
+ * /api/ticket-classes/{className}:
+ *   get:
+ *     summary: Get a ticket class by name
+ *     description: Returns a ticket class by its class name.
+ *     tags:
+ *       - Ticket Classes
+ *     parameters:
+ *       - in: path
+ *         name: className
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Ticket class name (standard, premium, or first)
+ *     responses:
+ *       200:
+ *         description: Ticket class found
+ *       404:
+ *         description: Ticket class not found
+ *       500:
+ *         description: Failed to fetch ticket class
+ */
 
 /**
  * @openapi
