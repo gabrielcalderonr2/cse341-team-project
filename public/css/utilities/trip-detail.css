@@ -168,16 +168,23 @@ article.route-detail {
                 gap: var(--space-sm);
 
                 .month-badge {
-                    padding: var(--space-sm) var(--space-md);
-                    background-color: var(--clr-surface);
-                    border: 1px solid var(--clr-border-light);
-                    border-radius: var(--radius-md);
-                    color: var(--clr-text-primary);
-                    font-size: var(--font-size-sm);
-                    font-weight: 500;
-                    min-width: 48px;
-                    text-align: center;
-                }
+    padding: var(--space-sm) var(--space-md);
+    background-color: var(--clr-surface);
+    border: 1px solid var(--clr-border-light);
+    border-radius: var(--radius-md);
+    color: var(--clr-text-primary);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    min-width: 48px;
+    text-align: center;
+    cursor: pointer;
+
+    &.active {
+        background-color: var(--clr-primary);
+        border-color: var(--clr-primary);
+        color: white;
+    }
+}
             }
         }
 
@@ -311,20 +318,33 @@ article.route-detail {
             }
 
             .route-stations {
-                grid-area: stations;
+    grid-area: stations;
 
-                .stations {
-                    display: inline-flex;
-                    flex-direction: row;
-                    align-items: center;
-                    justify-content: space-between;
-                    column-gap: var(--space-2xl);
+    .stations {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-lg);
+        width: 100%;
 
-                    .station {
-                        flex: 0 0 auto;
-                    }
-                }
-            }
+        .station {
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+
+        .station-details-toggle {
+            width: 100%;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: var(--font-size-xs);
+            padding: var(--space-sm);
+        }
+
+        .station-details {
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+    }
+}
 
             .route-operating {
                 grid-area: operations;
@@ -350,13 +370,7 @@ article.route-detail {
                 grid-template-columns: repeat(4, 1fr);
             }
 
-            .route-stations {
-                grid-area: stations;
-
-                .stations {
-                    display: flex;
-                }
-            }
+            
 
             .route-schedules {
                 .schedules-grid {

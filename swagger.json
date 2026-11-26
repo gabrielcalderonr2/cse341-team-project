@@ -1,0 +1,364 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Kizuna Rail API",
+    "version": "1.0.0",
+    "description": "API documentation for the Kizuna Rail application."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local development server"
+    }
+  ],
+  "paths": {
+    "/api/stations": {
+      "get": {
+        "summary": "Get all stations",
+        "description": "Returns all railway stations stored in the database.",
+        "tags": [
+          "Stations"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of stations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "prefecture": {
+                        "type": "string"
+                      },
+                      "region": {
+                        "type": "string"
+                      },
+                      "facilities": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "description": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to fetch stations"
+          }
+        }
+      }
+    },
+    "/api/stations/{id}": {
+      "get": {
+        "summary": "Get a station by ID",
+        "description": "Returns a specific railway station.",
+        "tags": [
+          "Stations"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Unique station identifier"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Station found"
+          },
+          "404": {
+            "description": "Station not found"
+          },
+          "500": {
+            "description": "Failed to fetch station"
+          }
+        }
+      }
+    },
+    "/api/ticket-classes": {
+  "get": {
+    "summary": "Get ticket classes",
+    "description": "Returns all ticket classes. An optional day parameter can be provided to retrieve ticket classes available for that day.",
+    "tags": [
+      "Ticket Classes"
+    ],
+    "parameters": [
+      {
+        "in": "query",
+        "name": "day",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday"
+          ]
+        },
+        "description": "Optional day of the week to filter available ticket classes."
+      }
+    ],
+    "responses": {
+  "200": {
+    "description": "List of ticket classes"
+  },
+  "400": {
+    "description": "Invalid day parameter"
+  },
+  "500": {
+    "description": "Failed to fetch ticket classes"
+  }
+}
+  }
+},
+    "/api/ticket-classes/{className}": {
+      "get": {
+        "summary": "Get a ticket class by name",
+        "description": "Returns a ticket class by its class name.",
+        "tags": [
+          "Ticket Classes"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "className",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Ticket class name (standard, premium, or first)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ticket class found"
+          },
+          "404": {
+            "description": "Ticket class not found"
+          },
+          "500": {
+            "description": "Failed to fetch ticket class"
+          }
+        }
+      }
+    },
+    "/api/trips": {
+      "get": {
+        "summary": "Get all trips",
+        "description": "Returns all scenic train trips stored in the database.",
+        "tags": [
+          "Trips"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of trips",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to fetch trips"
+          }
+        }
+      }
+    },
+    "/api/trips/{id}": {
+      "get": {
+        "summary": "Get a trip by ID",
+        "description": "Returns a specific scenic train trip.",
+        "tags": [
+          "Trips"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Unique trip identifier"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Trip found"
+          },
+          "404": {
+            "description": "Trip not found"
+          },
+          "500": {
+            "description": "Failed to fetch trip"
+          }
+        }
+      }
+    },
+    "/api/trips/{id}/schedules": {
+      "get": {
+        "summary": "Get schedules for a specific trip",
+        "description": "Returns schedules for a trip. An optional month can be provided to check whether the trip operates during that month.",
+        "tags": [
+          "Schedules"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Unique identifier of the trip"
+          },
+          {
+            "in": "query",
+            "name": "month",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 12
+            },
+            "description": "Month number (1-12)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of schedules for the selected trip",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "tripId": {
+                        "type": "string"
+                      },
+                      "departureTime": {
+                        "type": "string"
+                      },
+                      "arrivalTime": {
+                        "type": "string"
+                      },
+                      "daysOfWeek": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "status": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to fetch schedules"
+          }
+        }
+      }
+    },
+    "/api/bookings": {
+      "get": {
+        "summary": "Get all bookings",
+        "description": "Returns all bookings stored in the database.",
+        "tags": [
+          "Bookings"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of bookings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "scheduleId": {
+                        "type": "integer"
+                      },
+                      "tripId": {
+                        "type": "string"
+                      },
+                      "ticketClass": {
+                        "type": "string"
+                      },
+                      "selectedDay": {
+                        "type": "string"
+                      },
+                      "passengers": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "firstName": {
+                              "type": "string"
+                            },
+                            "lastName": {
+                              "type": "string"
+                            },
+                            "email": {
+                              "type": "string"
+                            },
+                            "phone": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to fetch bookings"
+          }
+        }
+      }
+    }
+  },
+  "components": {},
+  "tags": []
+}
