@@ -11,6 +11,7 @@ import {
 } from "../controllers/stations.js";
 import {
   getAllTicketClasses,
+  getTicketClassesForDay,
   getTicketClassByName,
 } from "../controllers/ticket-classes.js";
 import {
@@ -26,7 +27,13 @@ router.get('/api/trains', trainsApi);
 router.get('/api/stations', getAllStations);
 router.get('/api/stations/:id', getStationById);
 // Ticket Classes API
-router.get('/api/ticket-classes', getAllTicketClasses);
+router.get('/api/ticket-classes', (req, res, next) => {
+  if (req.query.day) {
+    return getTicketClassesForDay(req, res, next);
+  }
+
+  return getAllTicketClasses(req, res, next);
+});
 router.get('/api/ticket-classes/:className', getTicketClassByName);
 // Trips API
 router.get("/api/trips", getAllTrips);

@@ -94,22 +94,45 @@
       }
     },
     "/api/ticket-classes": {
-      "get": {
-        "summary": "Get all ticket classes",
-        "description": "Returns all available ticket classes.",
-        "tags": [
-          "Ticket Classes"
-        ],
-        "responses": {
-          "200": {
-            "description": "List of ticket classes"
-          },
-          "500": {
-            "description": "Failed to fetch ticket classes"
-          }
-        }
+  "get": {
+    "summary": "Get ticket classes",
+    "description": "Returns all ticket classes. An optional day parameter can be provided to retrieve ticket classes available for that day.",
+    "tags": [
+      "Ticket Classes"
+    ],
+    "parameters": [
+      {
+        "in": "query",
+        "name": "day",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday"
+          ]
+        },
+        "description": "Optional day of the week to filter available ticket classes."
       }
-    },
+    ],
+    "responses": {
+  "200": {
+    "description": "List of ticket classes"
+  },
+  "400": {
+    "description": "Invalid day parameter"
+  },
+  "500": {
+    "description": "Failed to fetch ticket classes"
+  }
+}
+  }
+},
     "/api/ticket-classes/{className}": {
       "get": {
         "summary": "Get a ticket class by name",

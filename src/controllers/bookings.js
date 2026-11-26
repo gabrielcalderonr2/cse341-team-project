@@ -2,6 +2,7 @@ import { getScheduleById } from "../models/schedules.js";
 import { getTripById } from "../models/trips.js";
 import {
   getAllTicketClasses,
+  getTicketClassesForDay,
   getTicketClassByName,
 } from "../models/ticket-classes.js";
 import {
@@ -73,8 +74,14 @@ export async function processBookingRequest(req, res) {
       return res.status(400).send("Schedule is unavailable.");
     }
 
-    if (!schedule.daysOfWeek.includes(selectedDay)) {
-      return res.status(400).send("Selected day is not available.");
+    const availableTicketClasses = await getTicketClassesForDay(selectedDay);
+
+    const isTicketAvailable = availableTicketClasses.some(
+    (ticket) => ticket.class === ticketClass
+    );
+
+    if (!isTicketAvailable) {
+    return res.status(400).send("Selected ticket class is not available for this day.");
     }
 
     const selectedTicketClass = await getTicketClassByName(ticketClass);

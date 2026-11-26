@@ -25,7 +25,7 @@
                                 value="<%= ticket.class %>"
                                 data-name="<%= ticket.name %>"
                                 data-price="<%= ticket.price %>"
-                                <%= index === 1 ? 'checked' : '' %>
+                                <%= index === 0 ? 'checked' : '' %>
                                 required
                             >
                             <div class="ticket-content">
@@ -54,6 +54,12 @@
                     <% }) %>
                 <% } %>
             </div>
+            <p
+  class="ticket-availability-message"
+  id="ticketAvailabilityMessage"
+  role="status"
+  aria-live="polite"
+></p>
         </section>
 
         <section class="day-selection">
@@ -194,8 +200,7 @@
     const selectedDayLabels = document.querySelectorAll('.days-display label');
     const passengersList = document.getElementById('passengersList');
     const addPassengerBtn = document.getElementById('addPassenger');
-    const ticketRadios = document.querySelectorAll('input[name="ticketClass"]');
-    
+        
     // Update summary displays
     const selectedTicketName = document.getElementById('selectedTicketName');
     const passengerCountDisplay = document.getElementById('passengerCount');
@@ -208,6 +213,76 @@
         const total = ticketPrice * passengerCount;
         totalAmount.textContent = `¥${total.toLocaleString()}`;
     };
+
+    const updateTicketAvailability = async (day) => {
+    const message = document.getElementById('ticketAvailabilityMessage');
+    const options = document.querySelectorAll('input[name="ticketClass"]');
+
+    options.forEach((input) => {
+        input.disabled = true;
+    });
+
+    message.textContent = 'Loading ticket classes...';
+
+    try {
+        const response = await fetch(
+            `/api/ticket-classes?day=${encodeURIComponent(day)}`
+        );
+
+        if (!response.ok) {
+            throw new Error('Unable to load ticket classes');
+        }
+
+        const availableClasses = await response.json();
+        const availableNames = new Set(
+            availableClasses.map((ticket) => ticket.class)
+        );
+
+        options.forEach((input) => {
+            const available = availableNames.has(input.value);
+
+            input.disabled = !available;
+            input.closest('.ticket-card').classList.toggle(
+                'unavailable',
+                !available
+            );
+
+            if (!available && input.checked) {
+                input.checked = false;
+            }
+        });
+
+        let selected = document.querySelector(
+            'input[name="ticketClass"]:checked:not(:disabled)'
+        );
+
+        if (!selected) {
+            selected = document.querySelector(
+                'input[name="ticketClass"]:not(:disabled)'
+            );
+
+            if (selected) selected.checked = true;
+        }
+
+        if (selected) {
+            selectedTicketName.textContent = selected.dataset.name;
+            ticketPrice = Number(selected.dataset.price);
+            message.textContent = '';
+        } else {
+            selectedTicketName.textContent = 'No tickets available';
+            ticketPrice = 0;
+            message.textContent = 'No ticket classes are available for this day.';
+        }
+
+        updateSummary();
+    } catch (error) {
+        console.error('Error loading ticket availability:', error);
+        message.textContent = 'Unable to load ticket availability. Please try again.';
+        options.forEach((input) => {
+            input.disabled = false;
+        });
+    }
+};
 
     const updatePassengerNumbers = () => {
         const cards = document.querySelectorAll('.passenger-card');
@@ -400,8 +475,12 @@
             });
 
             label.classList.add('selected');
-            label.querySelector('input').checked = true;
-            label.querySelector('input').setAttribute('checked', true);
+
+            const selectedDay = label.querySelector('input');
+            selectedDay.checked = true;
+            selectedDay.setAttribute('checked', true);
+
+            updateTicketAvailability(selectedDay.value);
         });
     });
 
@@ -415,28 +494,16 @@
         }
     });
 
-    ticketRadios.forEach((radio) => {
-        radio.addEventListener('change', (e) => {
-            e.preventDefault();
-            const selected = e.currentTarget;
+   document.querySelector('.ticket-options').addEventListener('change', (e) => {
+    const selected = e.target.closest('input[name="ticketClass"]');
 
-            // Update visual and input selection
-            ticketRadios.forEach((input) => {
-                input.checked = false;
-                input.removeAttribute('checked');
-            });
+    if (!selected || selected.disabled) return;
 
-            selected.checked = true;
-            selected.setAttribute('checked', true);
+    selectedTicketName.textContent = selected.dataset.name;
+    ticketPrice = Number(selected.dataset.price);
 
-            // Update summary
-            const ticketName = e.target.dataset.name;
-            ticketPrice = parseInt(e.target.dataset.price);
-            
-            selectedTicketName.textContent = ticketName;
-            updateSummary();
-        });
-    });
+    updateSummary();
+});
 
     document.getElementById('autofill').addEventListener('click', (e) => {
         e.preventDefault();
@@ -451,6 +518,13 @@
         ticketPrice = parseInt(selectedRadio.dataset.price);
     }
     updateSummary();
+    const selectedDay = document.querySelector(
+    'input[name="selectedDay"]:checked'
+);
+
+if (selectedDay) {
+    updateTicketAvailability(selectedDay.value);
+}
 </script>
 
 <%- include('../partials/footer') %>
