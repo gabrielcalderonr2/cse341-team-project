@@ -293,13 +293,104 @@ const hookScheduleMonths = () => {
             loadSchedules(month);
         });
     });
+    // Load schedules for the first available month by default.
+if (monthButtons.length > 0) {
+    const firstMonthButton = monthButtons[0];
+
+    firstMonthButton.classList.add('active');
+    loadSchedules(firstMonthButton.dataset.month);
+}
 };
+
+function hookStationDetails() {
+    const stationsContainer = document.querySelector('.route-stations');
+
+    if (!stationsContainer) return;
+
+    stationsContainer.addEventListener('click', async (event) => {
+        const button = event.target.closest('.station-details-toggle');
+
+        if (!button) return;
+
+        const stationId = button.dataset.stationId;
+        const detailsContainer = button.nextElementSibling;
+
+        if (!stationId || !detailsContainer) return;
+
+        const isExpanded = button.getAttribute('aria-expanded') === 'true';
+
+        if (isExpanded) {
+            detailsContainer.hidden = true;
+            button.setAttribute('aria-expanded', 'false');
+            button.textContent = 'View Station Details';
+            return;
+        }
+
+        detailsContainer.hidden = false;
+        button.setAttribute('aria-expanded', 'true');
+        button.textContent = 'Hide Station Details';
+
+        if (detailsContainer.dataset.loaded === 'true') return;
+
+        detailsContainer.textContent = 'Loading station details...';
+
+        try {
+            const response = await fetch(
+                `/api/stations/${encodeURIComponent(stationId)}`
+            );
+
+            if (!response.ok) {
+                throw new Error('Failed to load station details');
+            }
+
+            const station = await response.json();
+
+            detailsContainer.replaceChildren();
+
+            const description = document.createElement('p');
+            description.textContent = station.description;
+
+            const prefecture = document.createElement('p');
+            prefecture.textContent = `Prefecture: ${station.prefecture}`;
+
+            const region = document.createElement('p');
+            region.textContent = `Region: ${station.region}`;
+
+            const facilitiesTitle = document.createElement('p');
+            facilitiesTitle.textContent = 'Facilities:';
+
+            const facilitiesList = document.createElement('ul');
+
+            station.facilities.forEach((facility) => {
+                const item = document.createElement('li');
+                item.textContent = facility;
+                facilitiesList.appendChild(item);
+            });
+
+            detailsContainer.append(
+                description,
+                prefecture,
+                region,
+                facilitiesTitle,
+                facilitiesList
+            );
+
+            detailsContainer.dataset.loaded = 'true';
+        } catch (error) {
+            console.error('Error loading station details:', error);
+            detailsContainer.textContent =
+                'Unable to load station details. Please try again.';
+            detailsContainer.dataset.loaded = 'false';
+        }
+    });
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     hookTripsCatalog();
     hookTrainsCatalog();
     hookScheduleMonths();
     hookBookingsCatalog();
+    hookStationDetails();
 });
 
 // Load bookings dynamically for the administration page.

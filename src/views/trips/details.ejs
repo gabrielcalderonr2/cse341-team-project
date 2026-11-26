@@ -50,23 +50,42 @@
         </div>
 
         <div class="route-stations">
-            <h2>Trip</h2>
-            <div class="stations">
-                <div class="station">
-                    <span class="station-label">Start</span>
-                    <span class="station-name">
-                        <%= details.startStation.charAt(0).toUpperCase() + details.startStation.slice(1) %>
-                    </span>
-                </div>
+    <h2>Trip</h2>
 
-                <div class="station">
-                    <span class="station-label">End</span>
-                    <span class="station-name">
-                        <%= details.endStation.charAt(0).toUpperCase() + details.endStation.slice(1) %>
-                    </span>
-                </div>
-            </div>
+    <div class="stations">
+        <div class="station">
+            <span class="station-label">Start</span>
+            <span class="station-name">
+                <%= details.startStation %>
+            </span>
+            <button
+                type="button"
+                class="station-details-toggle"
+                data-station-id="<%= details.startStation %>"
+                aria-expanded="false"
+            >
+                View Station Details
+            </button>
+            <div class="station-details" hidden aria-live="polite"></div>
         </div>
+
+        <div class="station">
+            <span class="station-label">End</span>
+            <span class="station-name">
+                <%= details.endStation %>
+            </span>
+            <button
+                type="button"
+                class="station-details-toggle"
+                data-station-id="<%= details.endStation %>"
+                aria-expanded="false"
+                  >
+                View Station Details
+                 </button>
+                 <div class="station-details" hidden aria-live="polite"></div>
+                    </div>
+                </div>
+                </div>
 
         <div class="route-operating">
             <h2>Operating Schedule</h2>
