@@ -1,4 +1,6 @@
 import express from 'express';
+import session from 'express-session';
+import MongoStore from 'connect-mongo';
 import Path from 'path';
 import { fileURLToPath } from 'url';
 import pkg from './package.json' with { type: 'json' };
@@ -11,6 +13,25 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = Path.dirname(__filename);
 
 const app = express();
+
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        store: MongoStore.create({
+            mongoUrl: process.env.MONGODB_URI,
+            dbName: process.env.MONGODB_DB_NAME,
+            collectionName: 'sessions'
+        }),
+        cookie: {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 1000 * 60 * 60 * 24
+        }
+    })
+);
 // Swagger API documentation
 app.get('/api-docs/swagger.json', (req, res) => {
     return res.json(swaggerDocument);

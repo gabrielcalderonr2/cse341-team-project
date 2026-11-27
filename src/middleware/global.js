@@ -7,7 +7,9 @@ const setLocalVariables = (req, res, next) => {
 
     // Make any query parameters available to all templates
     res.locals.query = req.query;
-
+// Make the authenticated user available to all templates.
+res.locals.currentUser = req.session?.user || null;
+res.locals.isAuthenticated = Boolean(req.session?.user);
     next();
 };
 

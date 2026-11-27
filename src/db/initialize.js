@@ -23,9 +23,26 @@ const initializeDatabase = async (db) => {
     await collection.insertMany(documents);
   }
 
+  // Initialize standard user roles without deleting existing roles.
+  const roles = db.collection('roles');
+  const now = new Date();
+
+  for (const name of ['admin', 'user']) {
+    await roles.updateOne(
+      { name },
+      {
+        $setOnInsert: {
+          name,
+          createdAt: now,
+          updatedAt: now
+        }
+      },
+      { upsert: true }
+    );
+  }
+
   const bookings = db.collection('bookings');
   await bookings.createIndex({ id: 1 }, { unique: true });
 };
 
 export { initializeDatabase, starterCollections };
-
