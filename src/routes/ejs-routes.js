@@ -12,6 +12,7 @@ import {
 import { trainsPage } from './trains.js';
 import { bookingsAdminPage } from '../controllers/bookings.js';
 import { homePage, aboutPage, testErrorPage } from './index.js';
+import { requirePageRole } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -25,7 +26,7 @@ router.get('/about', aboutPage);
 router.get('/trains', trainsPage);
 
 // Bookings administration page
-router.get('/bookings-admin', bookingsAdminPage);
+router.get('/bookings-admin', requirePageRole('admin'), bookingsAdminPage);
 
 // Rail trips pages
 router.get('/trips', listTripsPage);

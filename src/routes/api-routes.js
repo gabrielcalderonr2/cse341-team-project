@@ -18,6 +18,7 @@ import {
   getAllTrips,
   getTripById,
 } from "../controllers/trips.js";
+import { requireApiRole } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -283,6 +284,6 @@ router.get('/api/trips/:id/schedules', (req, res, next) => {
  *       500:
  *         description: Failed to fetch bookings
  */
-router.get('/api/bookings', getAllBookings);
+router.get('/api/bookings', requireApiRole('admin'), getAllBookings);
 
 export default router;
